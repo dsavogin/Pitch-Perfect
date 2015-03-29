@@ -87,12 +87,44 @@ class PlaySoundViewController: UIViewController {
     }
     
     @IBAction func surpriseEffect(sender: UIButton) {
+        audioPlayer.stop()
+        audioEngine.stop()
+        audioEngine.reset()
         
+        var inputNode = AVAudioPlayerNode()
+        audioEngine.attachNode(inputNode)
+
+        var unitReverb = AVAudioUnitReverb()
+        unitReverb.loadFactoryPreset(AVAudioUnitReverbPreset.Cathedral)
+        unitReverb.wetDryMix = 50
+        
+        let format = unitReverb.inputFormatForBus(0)
+        audioEngine.connect(inputNode, to: unitReverb, format: format)
+        audioEngine.connect(unitReverb, to: audioEngine.outputNode, format: format)       
+        
+        inputNode.scheduleFile( audioFile, atTime: nil, completionHandler: nil)
+        audioEngine.startAndReturnError(nil)
+        
+        inputNode.play()
+        
+        stopButton.enabled = true
+        playButton.enabled = false
+        pauseButton.enabled = true
     }
     
     @IBAction func playResume(sender: UIButton) {
-        audioEngine.stop()
         audioPlayer.play()
+        playButton.enabled = false
+        pauseButton.enabled = true
+        stopButton.enabled = true
+    }
+    
+    @IBAction func pause(sender: UIButton) {
+        audioEngine.pause()
+        audioPlayer.pause()
+        playButton.enabled = true
+        pauseButton.enabled = false
+        stopButton.enabled = true
     }
     
     func  playAudioWithVariablePitch(pitch: Float)
@@ -123,7 +155,7 @@ class PlaySoundViewController: UIViewController {
     
     func enablePlyPauseButtons()
     {
-        playButton.enabled = false
+        playButton.enabled = true
         pauseButton.enabled = false
     }
     

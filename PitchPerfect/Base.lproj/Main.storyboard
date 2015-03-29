@@ -225,6 +225,9 @@
                                 <state key="normal" image="pauseButton">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="pause:" destination="lNp-kG-Pi1" eventType="touchUpInside" id="WF3-Yu-aFf"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="0.97309565857837077" alpha="1" colorSpace="calibratedWhite"/>
