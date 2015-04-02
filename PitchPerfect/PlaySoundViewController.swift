@@ -15,6 +15,7 @@ class PlaySoundViewController: UIViewController {
     var receivedAudio: RecordedAudio!
     var audioEngine: AVAudioEngine!
     var audioFile: AVAudioFile!
+    var audioEnginePaused: Bool!
 
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var pauseButton: UIButton!
@@ -28,6 +29,7 @@ class PlaySoundViewController: UIViewController {
         audioPlayer.enableRate = true
         audioEngine = AVAudioEngine()
         audioFile = AVAudioFile(forReading: receivedAudio.filePathUrl, error: nil)
+        audioEnginePaused = false
     }
     
     override  func viewDidAppear(animated: Bool) {
@@ -41,43 +43,38 @@ class PlaySoundViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    @IBAction func playSlow(sender: UIButton) {
+    func playAudio(rate: Float)
+    {
         audioPlayer.stop()
-        
         audioEngine.stop()
         audioEngine.reset()
         
         audioPlayer.currentTime = 0.0
-        audioPlayer.rate = 0.5
+        audioPlayer.rate = rate
         audioPlayer.play()
         
         stopButton.enabled = true
         playButton.enabled = false
         pauseButton.enabled = true
+        
+    }
+
+    @IBAction func playSlow(sender: UIButton) {
+        playAudio(0.5)
+    }
+    @IBAction func playFast(sender: UIButton) {
+        playAudio(1.5)
     }
     
     @IBAction func stopPlay(sender: UIButton) {
+        audioEngine.stop()
         audioPlayer.stop()
         stopButton.enabled = false
         playButton.enabled = false
         pauseButton.enabled = false
     }
     
-    @IBAction func playFast(sender: UIButton) {
-        audioPlayer.stop()
-        
-        audioEngine.stop()
-        audioEngine.reset()
-        
-        audioPlayer.currentTime = 0.0
-        audioPlayer.rate = 1.5
-        audioPlayer.play()
-        
-        stopButton.enabled = true
-        playButton.enabled = false
-        pauseButton.enabled = true
-    }
+    
     
     @IBAction func playChipmunk(sender: UIButton) {
         playAudioWithVariablePitch(1000)
@@ -113,13 +110,20 @@ class PlaySoundViewController: UIViewController {
     }
     
     @IBAction func playResume(sender: UIButton) {
-        audioPlayer.play()
+        if(audioEnginePaused.boolValue){
+            audioEngine.startAndReturnError(nil)
+        }else{
+            audioPlayer.play()
+        }
         playButton.enabled = false
         pauseButton.enabled = true
         stopButton.enabled = true
     }
     
     @IBAction func pause(sender: UIButton) {
+        if audioEngine.running{
+            audioEnginePaused = true
+        }
         audioEngine.pause()
         audioPlayer.pause()
         playButton.enabled = true
@@ -153,12 +157,5 @@ class PlaySoundViewController: UIViewController {
         pauseButton.enabled = true
     }
     
-    func enablePlyPauseButtons()
-    {
-        playButton.enabled = true
-        pauseButton.enabled = false
-    }
     
-    
-
 }
